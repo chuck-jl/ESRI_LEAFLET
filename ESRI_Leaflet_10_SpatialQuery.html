@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+	<title>Spatial Query</title>
+meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+#############load leaflet
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet-src.js"></script>
+################load arcgis
+#######################Load ESRI Leaflet#
+<script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+<style type="text/css">
+	body{margin: 0;padding: 0;}
+	#map{position: absolute;top: 0;right: 0;left: 0;bottom: 0;}
+</style>
+</head>
+<body>
+<style type="text/css">
+	#info-panel {position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: white;
+    padding: 10px;}
+    #info-panel select{
+    	font-size: : 14px;
+    }
+</style>
+<div id='map'></div>
+<div id='info-panel' class="leaflet-bar">
+	Neighborhoods
+  <select name="relation" id="relationSelect">
+    <option value="within">Within<options>
+    <option value="contains">Contains<options>
+    <option value="intersects">Intersects<options>
+    <option value="overlaps">Overlaps<options>
+  </select>
+  <select name="geometry" id="geometrySelect">
+    <option value="bounds">Bounds<options>
+    <option value="point">Point<options>
+    <option value="line">Line<options>
+    <option value="polygon">Polygon<options>
+  </select>
+</div>
+<script type="text/javascript">
+	var map=L.map('map').setView([45.525, -122.628], 11);
+	L.esri.basemapLayer('Topographic').addTo(map);
+	var neighorhoods = L.esri.featureLayer({
+        url: 'https://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/Neighborhoods_pdx/FeatureServer/0',
+        style:{
+        	color: 'brown',
+            weight: 1,
+            opacity: 0.4
+        },
+	}).addTo(map);
+	var bounds = L.latLngBounds([
+        [45.494556, -122.691536],
+        [45.538100, -122.608452]
+		]);
+	var rect = L.rectangle(bounds,{
+		color: 'blue',
+        weight: 2
+    }).addTo(map);
+    var marker = L.marker([45.571034, -122.686386]).addTo(map);
+    var line = L.polyline([
+    
+    [45.559256, -122.611885],
+    [45.502256, -122.562790],
+    [45.483244, -122.620468]],{
+    	color: 'blue',
+        weight: 2}).addTo(map);
+    var polygon = L.polygon([
+    [45.489261, -122.737198],
+    [45.486373, -122.688446],
+    [45.462539, -122.682266],
+    [45.441104, -122.693596],
+    [45.444717, -122.722435],
+    [45.461094, -122.738228],
+    [45.482521, -122.734108],
+    [45.489261, -122.737198]],{
+    	color: 'blue',
+        weight: 2
+    }).addTo(map);
+    var geometries= {
+    	bounds: bounds,
+    	line: line,
+    	polygon: polygon,
+    	point: marker
+    };
+    var relationship = document.getElementById('relationSelect');
+    var geometry = document.getElementById('geometrySelect');
+    var previousIds=[];
+    function reset(){
+    for (var i = previousIds.length - 1; i >= 0; i--) {
+      neighorhoods.resetStyle(previousIds[i]);
+    };
+  } 
+    function query(){
+    	reset();
+
+    	var inputGeometry= geometries[geometry.value];
+    	neighorhoods.query()[relationship.value](inputGeometry).ids(function(error,ids){
+    		previousIds= ids;
+    		for (var i = ids.length - 1; i >= 0; i--){
+                 neighorhoods.setFeatureStyle(ids[i], { color: 'red', weight: 2 });
+    		};
+    	});
+    }
+    geometry.addEventListener('change',query);
+    relationship.addEventListener('change',query);
+
+    neighorhoods.once('load',function(){query();});
+</script>
+
+</body>
+</html>

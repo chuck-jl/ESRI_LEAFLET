@@ -1,0 +1,64 @@
+<html>
+<head>
+	<meta charset=utf-8 />
+	<title>Simple Feature Layer</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    #############load leaflet
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet-src.js"></script>
+################load arcgis
+#######################Load ESRI Leaflet#
+<script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+<style>
+body {margin:0; padding:0;}
+#map {position:absolute;top:0;bottom: 0;right: 0;left: 0;}
+</style>
+</head>
+<body>
+	<div id='map'></div>
+    <script type="text/javascript">
+    	var map= L.map('map').setView([39,-97.5],4);
+var icons = {
+    N: L.icon({
+      iconUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-north.png',
+      iconRetinaUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-north@2x.png',
+      iconSize: [27, 31],
+      iconAnchor: [13.5, 17.5],
+      popupAnchor: [0, -11],
+    }),
+    S: L.icon({
+      iconUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-south.png',
+      iconRetinaUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-south@2x.png',
+      iconSize: [27, 31],
+      iconAnchor: [13.5, 13.5],
+      popupAnchor: [0, -11],
+    }),
+    E: L.icon({
+      iconUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-east.png',
+      iconRetinaUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-east@2x.png',
+      iconSize: [31, 27],
+      iconAnchor: [13.5, 17.5],
+      popupAnchor: [0, -11],
+    }),
+    W: L.icon({
+      iconUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-west.png',
+      iconRetinaUrl: 'https://esri.github.io/esri-leaflet/img/bus-stop-west@2x.png',
+      iconSize: [31, 27],
+      iconAnchor: [17.5, 13.5],
+      popupAnchor: [0, -11],
+    }),
+  };
+    	L.esri.basemapLayer('Streets').addTo(map);
+    	L.esri.featureLayer({
+    		url:'https://gisweb.townofchapelhill.org/arcgis/rest/services/CorporateData/BusStops/MapServer/0',
+    		pointToLayer: function(geojson,latlng){
+    			return L.marker(latlng,{
+    				icon: icons[geojson.properties.DIR]
+    			})
+    		},
+    	}).addTo(map);
+
+    </script>
+
+</body>
+</html>

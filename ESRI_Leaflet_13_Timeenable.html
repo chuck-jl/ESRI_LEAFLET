@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+	<title>Time Enabled service</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet-src.js"></script>
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.0.8"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+  </style>
+</head>
+<body>
+
+<!-- Include Leaflet.heat via rawgit.com
+in production you'd be better off hosting this library yourself -->
+<script src="https://rawgit.com/Leaflet/Leaflet.heat/gh-pages/dist/leaflet-heat.js"></script>
+
+<!-- Load Heatmap Feature Layer from CDN -->
+<script src="https://cdn.jsdelivr.net/leaflet.esri.heatmap-feature-layer/2.0.0-beta.1/esri-leaflet-heatmap-feature-layer.js"></script>
+
+<style type="text/css">
+	#time-ranges{
+		position:absolute;
+		top: 10px;
+		right: 10px;
+		z-index: 1000;
+		padding: 1em;
+		background: white;
+	}
+	#time-ranges input{
+		display: inline-block;
+        border: 1px solid #999;
+        font-size: 14px;
+        border-radius: 4px;
+        height: 28px;
+        line-height: 28px;
+	}
+	#time-ranges input[type='submit'] {
+    box-sizing: content-box;
+    padding: 0 1em;
+    text-transform: uppercase;
+    color: white;
+    background: #5C7DB8;
+    border-color: #5C7DB8;
+   }
+</style>
+<div id="map"></div>
+
+<div id='time-ranges' class="leaflet-bar">
+	<form action= '#' id="form">
+	<label for="from">
+      From
+      <input id='from' type="date" value='2014-01-01' name='from'>
+    </label>
+    <label for="to">
+      To
+      <input  id='to' type="date" value='2014-12-30' name='to'>
+    </label>
+    <input type="submit" value="Update">
+    </form>
+</div>
+<script type="text/javascript">
+	var timeForm = document.getElementById('form');
+	var startTimeInput=document.getElementById('from');
+	var endTimeInput=document.getElementById('to');
+
+	var map = L.map('map').setView([47.70, -117.45],13);
+	L.esri.basemapLayer('Gray').addTo(map);
+	L.esri.basemapLayer('GrayLabels').addTo(map);
+	var reports = L.esri.Heat.heatmapFeatureLayer({
+		url: 'https://services.arcgis.com/3PDwyTturHqnGCu0/arcgis/rest/services/Crime2014_ODL/FeatureServer/0',
+		timeField: 'BeginDate',
+		from: new Date(startTimeInput.value),
+		to: new Date(endTimeInput.value),
+		radius: 12
+	}).addTo(map);
+	timeForm.addEventListener('submit', function updateTimerange(e){
+		reports.setTimeRange(new Date(startTimeInput.value), new Date(endTimeInput.value));
+		e.preventDefault();
+	});
+
+</script>
+</body>
+</html>

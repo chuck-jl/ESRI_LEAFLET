@@ -1,0 +1,56 @@
+<html>
+<head>
+	<meta charset=utf-8 />
+	<title>Line_Styling</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    #############load leaflet
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet-src.js"></script>
+#######################Load ESRI Leaflet#
+<script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+<style>
+body {margin:0; padding:0;}
+#map {position:absolute;top:0;bottom: 0;right: 0;left: 0;}
+</style>
+</head>
+<body>
+<style>
+  #info-pane {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 400;
+    padding: 1em;
+    background: white;
+  }
+</style>
+<div id='map'></div>
+<div id="info-pane" class="leaflet-bar">Hover to inspect</div>
+<script type="text/javascript">
+	var map = L.map('map').setView([45.5275, -122.6717],4);
+	L.esri.basemapLayer('Streets').addTo(map);
+    var streets = L.esri.featureLayer({
+    	url:'https://services2.arcgis.com/1gVyYKfYgW5Nxb1V/arcgis/rest/services/BikePaths/FeatureServer/0',
+    	style: function (feature){
+    		var c,o=0.75;
+    		switch(feature.properties.Facility_Type){
+    			case 'Bike Lane' :
+    			c = '#007D7D';
+                break;
+                case 'Bike Route':
+                c = '#FF0000';
+                break;
+    		}
+    		return {color: c, opacity: o, weight: 5};
+    	}
+    }).addTo(map);
+    streets.on('mouseout',function(e){
+    document.getElementById('info-pane').innerHTML= 'Hover to Inspect';
+    });
+    streets.on('mouseover',function(e){
+    document.getElementById('info-pane').innerHTML= e.layer.feature.properties.Facility_Type;
+    });
+    
+</script>
+</body>
+</html>
